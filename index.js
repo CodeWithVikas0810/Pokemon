@@ -1,54 +1,71 @@
-const dropdown = document.getElementById('dropdown')
-const button = document.querySelector('button')
-const info = document.querySelector('.info')
+const dropdown = document.getElementById('dropdown');
+const button = document.querySelector('button');
+const info = document.querySelector('.info');
+
+const API_URL = 'https://pokeapi.co/api/v2/pokemon?limit=150';
+
+let allPokemons = [];
+let selectedPokemon = "";
 
 async function getInfo() {
-    const response = await fetch('http://pokeapi.co/api/v2/pokemon')
+  try {
+    const response = await fetch(API_URL);
     const data = await response.json();
-    console.log(data)
-    pokemons(data)
+    allPokemons = data.results;
+    populateDropdown(allPokemons);
+  } catch (error) {
+    console.error("Error fetching Pokémon list:", error);
+    alert("Failed to load Pokémon list. Please try again later.");
+  }
 }
-getInfo()
+getInfo();
 
-function pokemons(data) {
 
-    data.results.forEach((res) => {
-        const options = document.createElement('option')
-        options.value = res.name
-        options.innerText = res.name
-        dropdown.appendChild(options)
+function populateDropdown(data) {
+  data.forEach((res) => {
+    const option = document.createElement('option');
+    option.value = res.name;
+    option.innerText = res.name;
+    dropdown.appendChild(option);
+  });
 
-    })
-    let pokemon = ''
-    dropdown.addEventListener('change', (e) => {
-        pokemon  = e.target.value;
-        // getPowers(e.target.value, data)
-    })
-    button.addEventListener('click',()=>{
-        getPowers(pokemon,data)
-    })
-}
 
-async function getPowers(names, data) {
-    let urls = '';
-    data.results.forEach((res) => {
-        if (res.name == names) {
-            urls = res.url;
-        }
-    })
-    const response = await fetch(urls)
-    const datas = await response.json()
+  dropdown.addEventListener('change', (e) => {
+    selectedPokemon = e.target.value;
+    button.disabled = !selectedPokemon;
+  });
 
-    showAbility(datas)
-
+  button.addEventListener('click', () => {
+    if (!selectedPokemon) {
+      alert("Please select a Pokémon first!");
+      return;
+    }
+    getPokemonData(selectedPokemon);
+  });
 }
 
-function showAbility(datas) {
-    info.innerHTML = ''
-    const h2 = document.createElement('h2')
-    h2.innerText = `Name:` + datas.name;
-    const height = document.createElement('p')
-    height.innerText = 'height:' + datas.height;
-    info.appendChild(h2)
-    info.appendChild(height)
+
+async function getPokemonData(name) {
+  const pokemonData = allPokemons.find(res => res.name === name);
+  if (!pokemonData) return;
+
+  try {
+    const response = await fetch(pokemonData.url);
+    const data = await response.json();
+    showAbility(data);
+  } catch (error) {
+    console.error("Error fetching Pokémon data:", error);
+    alert("Failed to load Pokémon details.");
+  }
+}
+
+
+function showAbility(data) {
+  info.innerHTML = `
+    <h2>${data.name.toUpperCase()}</h2>
+    <p><strong>Height:</strong> ${data.height}</p>
+    <p><strong>Weight:</strong> ${data.weight}</p>
+    <p><strong>Base Experience:</strong> ${data.base_experience}</p>
+    <img src="${data.sprites.front_default}" alt="${data.name}">
+  `;
 }

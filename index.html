@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokémon Info</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <select name="pokemon" id="dropdown"></select>
-    <button>Get details</button>
+  <div class="container">
+    <h1>Pokémon Finder</h1>
+    <select id="dropdown">
+      <option value="">-- Select a Pokémon --</option>
+    </select>
+    <button disabled>Get Info</button>
     <div class="info"></div>
-
-    <script src="index.js"></script>
+  </div>
+  <script src="index.js"></script>
 </body>
 </html>
